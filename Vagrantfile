@@ -1,8 +1,10 @@
 VAGRANT_APP_NAME   = 'sampleapp'
-VAGRANT_HOSTNAME   = 'sampleapp.dev'
+HOSTNAME           = 'sampleapp.dev'
+HOSTNAME_ALIASES   = []
 VAGRANT_IP         = '192.168.99.99'
 VAGRANT_MEMORY_MB  = 4096
 VAGRANT_CPUS       = 2
+VAGRANT_BOX        = 'bento/ubuntu-16.04'
 
 VAGRANT_PORTS = {
   puma: { guest: 3000, host: 3000 },
@@ -59,22 +61,20 @@ Vagrant.configure('2') do |config|
   config.bindfs.bind_folder '/var/app', '/app'
 
   config.vm.define VAGRANT_APP_NAME do |machine|
-    # NOTE: Official ubuntu/xenial64 uses different user name for SSH (it is "ubuntu" instead of "vagrant")
-    config.vm.box = 'bento/ubuntu-16.04'
-    machine.vm.hostname = VAGRANT_HOSTNAME
+    config.vm.box = VAGRANT_BOX
+    machine.vm.hostname = HOSTNAME
 
     VAGRANT_PORTS.values.each do |ports|
-      machine.vm.network('forwarded_port', **ports)
+      machine.vm.network('forwarded_port', auto_correct: true, **ports)
     end
 
     machine.vm.network 'private_network', ip: VAGRANT_IP
-
-    # Subdomain alias:
-    # machine.hostmanager.aliases = %W(admin.#{VAGRANT_HOSTNAME})
-
-    config.vm.provision 'file', source: '~/Mega/PassionDig/Configuration/secrets.yml.key', destination: '~/.secrets.yml.key'
-    config.vm.provision 'shell', path: 'provision.sh'
+    machine.hostmanager.aliases = HOSTNAME_ALIASES
+    config.vm.provision :shell, path: 'provision.sh', privileged: false
   end
 
   config.ssh.forward_agent = true
+
+  # Prevent tty errors
+  config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
 end
