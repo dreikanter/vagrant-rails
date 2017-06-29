@@ -136,7 +136,8 @@ sudo make install
 cd utils
 sudo ./install_server.sh
 sudo update-rc.d redis_6379 defaults
-sudo rm -rf /tmp/redis-stable*
+cd
+sudo rm -rf ./redis-stable*
 
 ###############################################################################
 
@@ -147,7 +148,9 @@ cd
 sudo curl --silent --show-error -O https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/2.3.1/elasticsearch-2.3.1.deb
 sudo dpkg -i elasticsearch-2.3.1.deb
 sudo systemctl enable elasticsearch.service
-sudo rm -rf elasticsearch*
+
+cd
+sudo rm -rf ./elasticsearch*
 
 echo "rewrite config"
 sudo bash -c "cat > /etc/elasticsearch/elasticsearch.yml" <<EOL
@@ -190,6 +193,7 @@ echo "cd /app" >> ~/.bashrc
 
 say "cleanup"
 
+sudo apt autoremove --yes
 sudo apt-get clean
 cat /dev/null > ~/.bash_history && history -c && exit
 
