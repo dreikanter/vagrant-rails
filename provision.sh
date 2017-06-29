@@ -1,6 +1,3 @@
-set -e
-set -x
-
 export POSTGRES_DB_NAME="sampleapp"
 export RUBY_VERSION="2.4.1"
 export DEPLOY_USER="vagrant"
@@ -18,90 +15,26 @@ sudo update-locale LANGUAGE=$LANGUAGE LC_ALL=$LC_ALL LANG=$LANG LC_TYPE=$LC_TYPE
 cd
 sudo apt-get update --yes
 sudo apt-get install --yes \
-  language-pack-en \
-  python-minimal \
-  python-pip \
-  python-passlib \
-  zlib1g-dev \
-  build-essential \
-  libssl-dev \
-  libreadline-dev \
-  libyaml-dev \
-  libxml2-dev \
-  libxslt1-dev \
-  software-properties-common \
-  libcurl4-openssl-dev \
-  libpq-dev \
-  imagemagick \
   git \
   curl \
-  htop \
-  tcl \
-  ntp \
-  boxes
+  wget \
+  zlib1g-dev\
+  build-essential\
+  libssl-dev\
+  libreadline-dev\
+  libyaml-dev\
+  libxml2-dev\
+  libxslt1-dev\
+  libcurl4-openssl-dev\
+  python-software-properties \
+  2> /dev/null
 
-  # python-software-properties \
-  # libcurl3 \
-  # libcurl3-gnutls \
-  # rsyslog-gnutls \
-  # qt5-default \
-  # libqt5webkit5-dev \
 
-say "install rbenv"
 
-# sudo -u $DEPLOY_USER rm -rf ~/.rbenv
-
-if [ ! -d "$HOME/.rbenv" ]; then
-  echo "Installing rbenv and ruby-build"
-
-  git clone https://github.com/sstephenson/rbenv.git ~/.rbenv
-  git clone https://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
-
-  echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
-  echo 'eval "$(rbenv init -)"' >> ~/.bashrc
-
-else
-  echo "Updating rbenv and ruby-build"
-
-  cd ~/.rbenv
-  git pull
-
-  cd ~/.rbenv/plugins/ruby-build
-  git pull
-fi
-
-export PATH="$HOME/.rbenv/bin:$PATH"
-eval "$(rbenv init -)"
-
-if [ ! -d "$HOME/.rbenv/versions/$RUBY_VERSION" ]; then
-  say "install ruby"
-
-  rbenv install $RUBY_VERSION
-  rbenv global $RUBY_VERSION
-
-  say "set up gem"
-
-  echo "---" > ~/.gemrc
-  echo "gem: --no-ri --no-rdoc" >> ~/.gemrc
-  echo "benchmark: false" >> ~/.gemrc
-  echo "verbose: true" >> ~/.gemrc
-  echo "backtrace: true" >> ~/.gemrc
-
-  gem update --system
-  gem update
-
-  say "install bundler"
-
-  gem install bundler
-  bundle config path vendor/bundle
-
-  rbenv rehash
-fi
 echo "-----> install postgres"
 
 sudo apt-get install --yes postgresql postgresql-contrib
 
-echo "rewrite config"
 sudo bash -c "cat > /etc/postgresql/9.5/main/pg_hba.conf" <<EOL
 local all all trust
 host all all 127.0.0.1/32 trust
@@ -152,42 +85,84 @@ EOL
 # TODO: Don't add the line if it's already there
 sudo bash -c 'echo "ES_HEAP_SIZE=64m" >> /etc/default/elasticsearch'
 
-###############################################################################
+sudo service elasticsearch start
 
-say "install nodejs"
+
+
+echo "-----> install nodejs"
 
 cd
 sudo curl --silent --show-error -L https://deb.nodesource.com/setup_6.x | sudo -E bash -
 sudo apt-get install --yes nodejs
 
-###############################################################################
 
-say "install yarn"
+
+echo "-----> install yarn"
 
 sudo curl --silent --show-error https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 sudo apt-get update && sudo apt-get install --yes yarn
 
-###############################################################################
 
-say ".bashrc"
 
-echo "cd /app" >> ~/.bashrc
+echo "-----> install rbenv"
 
-###############################################################################
+git clone git://github.com/sstephenson/rbenv.git ~/.rbenv
+git clone git://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
 
-say "cleanup"
+cat >> ~/.bashrc <<EOL
+export PATH="$HOME/.rbenv/bin:$HOME/.rbenv/shims:$PATH"
+eval "\$(rbenv init -)"
+EOL
+
+export PATH="$HOME/.rbenv/bin:$HOME/.rbenv/shims:$PATH"
+eval "$(rbenv init -)"
+
+
+
+echo "-----> install ruby"
+
+rbenv install 2.4.1
+rbenv global 2.4.1
+
+
+
+echo "-----> update .gemrc"
+
+cat > ~/.gemrc <<EOL
+---
+gem: --no-ri --no-rdoc
+benchmark: false
+verbose: true
+backtrace: true
+EOL
+
+
+
+echo "-----> install gems"
+
+gem update --system
+gem update
+gem install bundler
+
+rbenv rehash
+
+
+
+echo "-----> cleanup"
 
 sudo apt autoremove --yes
 sudo apt-get clean
-cat /dev/null > ~/.bash_history && history -c && exit
 
-###############################################################################
 
-echo "rbenv:   $(rbenv --version)"
-echo "ruby:    $(ruby --version)"
-echo "bundler: $(bundler --version)"
-echo "yarn:    $(yarn --version)"
-echo "node:    $(node --version)"
-echo "psql:    $(psql --version)"
-echo "redis:   $(redis-server --version)"
+
+echo "-----> report"
+
+echo "rbenv:         $(rbenv --version)"
+echo "ruby:          $(ruby --version)"
+echo "bundler:       $(bundler --version)"
+echo "yarn:          $(yarn --version)"
+echo "node:          $(node --version)"
+echo "psql:          $(psql --version)"
+echo "redis:         $(redis-server --version)"
+echo "elasticsearch: $(elasticsearch --version)"
