@@ -5,7 +5,8 @@ export POSTGRES_DB_NAME="sampleapp"
 export RUBY_VERSION="2.4.1"
 export DEPLOY_USER="vagrant"
 
-###############################################################################
+set -e
+set -x
 
 export LANGUAGE=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
@@ -14,8 +15,8 @@ export LC_TYPE=en_US.UTF-8
 
 sudo update-locale LANGUAGE=$LANGUAGE LC_ALL=$LC_ALL LANG=$LANG LC_TYPE=$LC_TYPE
 
-###############################################################################
-
+cd
+sudo apt-get update --yes
 sudo apt-get install --yes \
   language-pack-en \
   python-minimal \
@@ -45,12 +46,6 @@ sudo apt-get install --yes \
   # rsyslog-gnutls \
   # qt5-default \
   # libqt5webkit5-dev \
-
-###############################################################################
-
-say () { echo $1 | boxes -d shell -a hcvc -p a1l5r5 ;}
-
-###############################################################################
 
 say "install rbenv"
 
@@ -102,10 +97,7 @@ if [ ! -d "$HOME/.rbenv/versions/$RUBY_VERSION" ]; then
 
   rbenv rehash
 fi
-
-###############################################################################
-
-say "install postgres"
+echo "-----> install postgres"
 
 sudo apt-get install --yes postgresql postgresql-contrib
 
@@ -118,15 +110,13 @@ EOL
 
 sudo service postgresql restart
 
-###############################################################################
 
-say "create postgres database"
+
+echo "-----> create postgres database"
 
 createdb $POSTGRES_DB_NAME --username=postgres
 
-###############################################################################
 
-say "install redis"
 
 cd
 sudo curl --silent --show-error -O http://download.redis.io/redis-stable.tar.gz
@@ -139,9 +129,8 @@ sudo update-rc.d redis_6379 defaults
 cd
 sudo rm -rf ./redis-stable*
 
-###############################################################################
 
-say "install elasticsearch"
+echo "-----> install elasticsearch"
 
 sudo apt-get install default-jre
 cd
