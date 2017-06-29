@@ -51,6 +51,8 @@ Vagrant.configure('2') do |config|
     vb.gui = false
   end
 
+  config.vbguest.auto_update = false
+
   config.hostmanager.enabled = true
   config.hostmanager.manage_host = true
   config.hostmanager.manage_guest = true
