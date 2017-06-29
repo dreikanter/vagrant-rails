@@ -128,8 +128,8 @@ createdb $POSTGRES_DB_NAME --username=postgres
 
 say "install redis"
 
-cd /tmp
-curl -O http://download.redis.io/redis-stable.tar.gz
+cd
+sudo curl --silent --show-error -O http://download.redis.io/redis-stable.tar.gz
 tar -xzf redis-stable.tar.gz
 cd redis-stable
 sudo make install
@@ -142,8 +142,8 @@ sudo rm -rf /tmp/redis-stable*
 
 say "install elasticsearch"
 
-cd /tmp
-sudo wget --quiet -O elasticsearch-2.3.1.deb https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/2.3.1/elasticsearch-2.3.1.deb
+cd
+sudo curl --silent --show-error -O https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/2.3.1/elasticsearch-2.3.1.deb
 sudo dpkg -i elasticsearch-2.3.1.deb
 sudo systemctl enable elasticsearch.service
 sudo rm -rf elasticsearch*
@@ -167,15 +167,15 @@ sudo bash -c 'echo "ES_HEAP_SIZE=64m" >> /etc/default/elasticsearch'
 
 say "install nodejs"
 
-cd /tmp
-curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+cd
+sudo curl --silent --show-error -L https://deb.nodesource.com/setup_6.x | sudo -E bash -
 sudo apt-get install --yes nodejs
 
 ###############################################################################
 
 say "install yarn"
 
-curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+sudo curl --silent --show-error https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 sudo apt-get update && sudo apt-get install --yes yarn
 
