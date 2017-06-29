@@ -128,7 +128,7 @@ sudo systemctl restart redis-server.service
 
 echo "-----> install elasticsearch"
 
-sudo apt-get install default-jre
+sudo apt-get install --yes default-jre
 cd
 sudo curl --silent --show-error -O https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/2.3.1/elasticsearch-2.3.1.deb
 sudo dpkg -i elasticsearch-2.3.1.deb
