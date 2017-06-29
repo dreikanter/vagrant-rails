@@ -118,16 +118,12 @@ createdb $POSTGRES_DB_NAME --username=postgres
 
 
 
-cd
-sudo curl --silent --show-error -O http://download.redis.io/redis-stable.tar.gz
-tar -xzf redis-stable.tar.gz
-cd redis-stable
-sudo make install
-cd utils
-sudo ./install_server.sh
-sudo update-rc.d redis_6379 defaults
-cd
-sudo rm -rf ./redis-stable*
+echo "-----> install redis"
+
+sudo apt-get install --yes redis-server
+sudo systemctl enable redis-server.service
+sudo systemctl restart redis-server.service
+
 
 
 echo "-----> install elasticsearch"
