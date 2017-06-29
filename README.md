@@ -1,5 +1,20 @@
 # Vagrant configuration for Rails development environment
 
+Will install:
+
+- Ubuntu Xenial 16.04
+- rbenv
+- rbenv-build
+- Ruby
+- PostgreSQL
+- Redis
+- ElasticSearch
+- NodeJS
+- Yarn
+- Bundler
+
+Rails app setup after first log in:
+
 ``` bash
 cd /app
 bundle install
