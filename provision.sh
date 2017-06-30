@@ -1,8 +1,5 @@
 export POSTGRES_DB_NAME="sampleapp"
-export RUBY_VERSION="2.4.1"
-export DEPLOY_USER="vagrant"
 
-set -e
 set -x
 
 export LANGUAGE=en_US.UTF-8
@@ -27,6 +24,8 @@ sudo apt-get install --yes \
   libxslt1-dev\
   libcurl4-openssl-dev\
   python-software-properties \
+  sqlite3 \
+  libsqlite3-dev \
   2> /dev/null
 
 
@@ -105,25 +104,23 @@ sudo apt-get update && sudo apt-get install --yes yarn
 
 
 
-echo "-----> install rbenv"
-
-git clone git://github.com/sstephenson/rbenv.git ~/.rbenv
-git clone git://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
-
-cat >> ~/.bashrc <<EOL
-export PATH="$HOME/.rbenv/bin:$HOME/.rbenv/shims:$PATH"
-eval "\$(rbenv init -)"
-EOL
-
-export PATH="$HOME/.rbenv/bin:$HOME/.rbenv/shims:$PATH"
-eval "$(rbenv init -)"
-
-
-
 echo "-----> install ruby"
 
-rbenv install 2.4.1
-rbenv global 2.4.1
+sudo apt-get install software-properties-common
+sudo apt-add-repository ppa:brightbox/ruby-ng
+sudo apt-get update --yes
+sudo apt-get install --yes ruby2.4 ruby2.4-dev
+
+cat >> ~/.bashrc <<EOL
+export GEM_HOME=$HOME/.gem/ruby/2.4.0
+export PATH=$HOME/.gem/ruby/2.4.0/bin:$PATH
+EOL
+
+source ~/.bashrc
+
+sudo gem update --system
+gem update
+gem install bundle
 
 
 
@@ -139,16 +136,6 @@ EOL
 
 
 
-echo "-----> install gems"
-
-gem update --system
-gem update
-gem install bundler
-
-rbenv rehash
-
-
-
 echo "-----> cleanup"
 
 sudo apt autoremove --yes
@@ -158,11 +145,10 @@ sudo apt-get clean
 
 echo "-----> report"
 
-echo "rbenv:         $(rbenv --version)"
 echo "ruby:          $(ruby --version)"
+echo "gem:           $(gem --version) GEM_HOME: $GEM_HOME"
 echo "bundler:       $(bundler --version)"
 echo "yarn:          $(yarn --version)"
 echo "node:          $(node --version)"
 echo "psql:          $(psql --version)"
 echo "redis:         $(redis-server --version)"
-echo "elasticsearch: $(elasticsearch --version)"
