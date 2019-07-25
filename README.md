@@ -2,48 +2,38 @@
 
 Will install:
 
-- Ubuntu Xenial 16.04
-- rbenv
-- rbenv-build
-- Ruby
+- Ubuntu Server (19.04 LTS)
+- Ruby (via [ruby-install](https://github.com/postmodern/ruby-install))
 - PostgreSQL
 - Redis
 - ElasticSearch
 - NodeJS
 - Yarn
-- Bundler
+
+Set up:
+
+``` bash
+brew cask install virtualbox vagrant
+vagrant up
+```
 
 Rails app setup after first log in (assuming Vagrant file is in you project root):
 
 ``` bash
 cd /app
 bundle install
-bundle exec rails db:drop --trace
-bundle exec rails db:create --trace
-bundle exec rails db:migrate --trace
-bundle exec rails db:seed --trace
+yarn install
+bundle exec rails db:drop db:create db:migrate db:seed --trace
 ```
 
-Just in case, this is how you install ruby from sources, with `rbenv` and `ruby-build`:
+Running Rails app server:
 
 ``` bash
-echo "-----> install rbenv"
+rails s
+```
 
-git clone git://github.com/sstephenson/rbenv.git ~/.rbenv
-git clone git://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
+Running [webpack-dev-server](https://github.com/webpack/webpack-dev-server):
 
-cat >> ~/.bashrc <<EOL
-export PATH="$HOME/.rbenv/bin:$HOME/.rbenv/shims:$PATH"
-eval "\$(rbenv init -)"
-EOL
-
-export PATH="$HOME/.rbenv/bin:$HOME/.rbenv/shims:$PATH"
-eval "$(rbenv init -)"
-
-
-
-echo "-----> install ruby with rbenv"
-
-rbenv install 2.4.1
-rbenv global 2.4.1
+``` bash
+bin/webpack-dev-server
 ```
